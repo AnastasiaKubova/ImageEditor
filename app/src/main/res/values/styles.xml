@@ -5,6 +5,30 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
+    <style name="bottom_sheet_dialog">
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <style name="bottom_sheet_text">
+        <item name="android:gravity">left|center</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="bottom_sheet_menu_text">
+        <item name="android:gravity">left|center</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="bottom_menu">
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
+    <style name="template_panel">
+        <item name="android:background">@color/colorPrimaryTransparent</item>
+    </style>
 </resources>

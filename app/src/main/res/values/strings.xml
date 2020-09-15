@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">ImageEditor</string>
+    <string name="app_name">Image Editor</string>
+    <string name="menu">Menu</string>
+    <string name="select_image">Select image</string>
+    <string name="open_camera">Open camera</string>
+    <string name="save">Save</string>
+    <string name="flip">Flip</string>
+    <string name="rotate_left">Rotate left</string>
+    <string name="rotate_right">Rotate right</string>
+    <string name="resize">Resize</string>
+    <string name="image_preview">Image preview</string>
+    <string name="select_picture">Select Picture</string>
 </resources>
