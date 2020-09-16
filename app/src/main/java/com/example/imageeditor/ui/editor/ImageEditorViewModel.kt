@@ -37,6 +37,10 @@ class ImageEditorViewModel: ViewModel() {
         bitmap.value = ImageManager.cropRectangle()
     }
 
+    fun cropCustom(x: Float, y: Float) {
+        bitmap.value = ImageManager.cropCustom(x, y)
+    }
+
     fun resetCrop() {
         bitmap.value = ImageManager.resetCrop()
     }

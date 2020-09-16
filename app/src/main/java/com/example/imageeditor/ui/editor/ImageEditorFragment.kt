@@ -47,6 +47,7 @@ class ImageEditorFragment: BaseFragment() {
         template_oval.setOnClickListener { resizeOvalClick() }
         template_rectangle.setOnClickListener { resizeRectangleClick() }
         template_reset.setOnClickListener { resetResizeClick() }
+        template_custom.setOnClickListener { resizeCustomClick(ImageManager.DEFAULT_PADDING, ImageManager.DEFAULT_PADDING) }
 
         /* Init Observers. */
         initObservers()
@@ -136,14 +137,25 @@ class ImageEditorFragment: BaseFragment() {
         viewModel.cropRectangle()
     }
 
+    private fun resizeCustomClick(x: Float, y: Float) {
+        viewModel.cropCustom(x, y)
+    }
+
     private fun showTemplatePanel(vis: Int, save: Boolean) {
         template_panel.visibility = vis
         when(vis) {
             View.GONE -> {
                 isCropPanelOpen = false
+                image_preview_editor.setOnTouchListener(null)
             }
             View.VISIBLE -> {
                 isCropPanelOpen = true
+                image_preview_editor.setOnTouchListener { v, event ->
+                    if (event.action == MotionEvent.ACTION_MOVE) {
+                        viewModel.cropCustom(event.x, event.y)
+                    }
+                    true
+                }
             }
         }
         if (save) {
