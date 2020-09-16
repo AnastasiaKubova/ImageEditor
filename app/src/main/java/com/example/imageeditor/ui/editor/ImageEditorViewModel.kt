@@ -1,10 +1,11 @@
 package com.example.imageeditor.ui.editor
 
 import android.graphics.Bitmap
-import android.graphics.Matrix
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.imageeditor.utility.ImageManager
+import com.example.imageeditor.utility.DrawManager
+import com.example.imageeditor.utility.ImagePickerManager
 
 class ImageEditorViewModel: ViewModel() {
 
@@ -13,39 +14,39 @@ class ImageEditorViewModel: ViewModel() {
     }
 
     fun initBitmap(btmp: Bitmap) {
-        ImageManager.currentBitmap = btmp
+        DrawManager.currentBitmap = btmp
         bitmap.value = btmp
     }
 
     fun rotateLeft() {
-        bitmap.value = ImageManager.rotateImage(ImageManager.ROTATE_LEFT)
+        bitmap.value = DrawManager.rotateImage(ImagePickerManager.ROTATE_LEFT)
     }
 
     fun rotateRight() {
-        bitmap.value = ImageManager.rotateImage(ImageManager.ROTATE_RIGHT)
+        bitmap.value = DrawManager.rotateImage(ImagePickerManager.ROTATE_RIGHT)
     }
 
     fun flip() {
-        bitmap.value = ImageManager.flipImage()
+        bitmap.value = DrawManager.flipImage()
     }
 
     fun cropOval() {
-        bitmap.value = ImageManager.cropOval()
+        bitmap.value = DrawManager.cropOval()
     }
 
     fun cropRectangle() {
-        bitmap.value = ImageManager.cropRectangle()
+        bitmap.value = DrawManager.cropRectangle()
     }
 
     fun cropCustom(x: Float, y: Float) {
-        bitmap.value = ImageManager.cropCustom(x, y)
+        bitmap.value = DrawManager.cropCustom(x, y)
     }
 
     fun resetCrop() {
-        bitmap.value = ImageManager.resetCrop()
+        bitmap.value = DrawManager.resetCrop()
     }
 
     fun saveCrop() {
-        bitmap.value = ImageManager.saveCrop()
+        bitmap.value = DrawManager.saveCrop()
     }
 }

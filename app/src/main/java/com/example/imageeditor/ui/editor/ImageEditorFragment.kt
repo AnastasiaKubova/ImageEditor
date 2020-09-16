@@ -2,19 +2,18 @@ package com.example.imageeditor.ui.editor
 
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.imageeditor.R
 import com.example.imageeditor.ui.BaseFragment
-import com.example.imageeditor.utility.ImageManager
+import com.example.imageeditor.utility.ImagePickerManager
 import kotlinx.android.synthetic.main.bottom_menu.*
 import kotlinx.android.synthetic.main.image_editot_fragment.*
-import kotlinx.android.synthetic.main.template_panel.*
+import kotlinx.android.synthetic.main.crop_panel.*
 
 
 class ImageEditorFragment: BaseFragment() {
@@ -24,7 +23,6 @@ class ImageEditorFragment: BaseFragment() {
     }
 
     private val viewModel by viewModels<ImageEditorViewModel>()
-    private var isCropPanelOpen = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,16 +36,6 @@ class ImageEditorFragment: BaseFragment() {
 
         /* Init menu. */
         setHasOptionsMenu(true)
-
-        /* Init click listeners. */
-        rotate_left_bottom_menu.setOnClickListener { rotateLeftClick() }
-        rotate_right_bottom_menu.setOnClickListener { rotateRightClick() }
-        resize_bottom_menu.setOnClickListener { resizeClick() }
-        flip_bottom_menu.setOnClickListener { flipClick() }
-        template_oval.setOnClickListener { resizeOvalClick() }
-        template_rectangle.setOnClickListener { resizeRectangleClick() }
-        template_reset.setOnClickListener { resetResizeClick() }
-        template_custom.setOnClickListener { resizeCustomClick(ImageManager.DEFAULT_PADDING, ImageManager.DEFAULT_PADDING) }
 
         /* Init Observers. */
         initObservers()
@@ -77,20 +65,25 @@ class ImageEditorFragment: BaseFragment() {
         var bitmap: Bitmap? = null
 
         /* From camera. */
-        if (requestCode == ImageManager.REQUEST_IMAGE_CAPTURE && resultCode == AppCompatActivity.RESULT_OK) {
+        if (requestCode == ImagePickerManager.REQUEST_IMAGE_CAPTURE && resultCode == AppCompatActivity.RESULT_OK) {
             if (data.extras == null) {
                 return
             }
             bitmap = data.extras!!.get("data") as Bitmap
         }
         /* From default picker. */
-        else if (requestCode == ImageManager.PICK_IMAGE) {
+        else if (requestCode == ImagePickerManager.PICK_IMAGE) {
             if (data.data == null) {
                 return
             }
+//            val uri = data.data
+//            if (uri != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                requireActivity().contentResolver.takePersistableUriPermission(uri, data.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//            }
+//            val path = uri.toString()
             val imageStream = requireActivity().contentResolver.openInputStream(data.data!!)
             if (imageStream != null) {
-                bitmap = ImageManager.createBitmap(imageStream)
+                bitmap = ImagePickerManager.createBitmap(imageStream)
             }
         }
         if (bitmap != null) {
@@ -103,65 +96,6 @@ class ImageEditorFragment: BaseFragment() {
         val bitmap = Observer<Bitmap> { bitmap ->
             image_preview_editor.setImageBitmap(bitmap)
         }
-        viewModel.bitmap.observe(requireActivity(), bitmap)
-    }
-
-    private fun rotateLeftClick() {
-        viewModel.rotateLeft()
-        showTemplatePanel(View.GONE, true)
-    }
-
-    private fun rotateRightClick() {
-        viewModel.rotateRight()
-        showTemplatePanel(View.GONE, true)
-    }
-
-    private fun resetResizeClick() {
-        showTemplatePanel(View.GONE, false)
-    }
-
-    private fun flipClick() {
-        viewModel.flip()
-        showTemplatePanel(View.GONE, true)
-    }
-
-    private fun resizeClick() {
-        showTemplatePanel(if (isCropPanelOpen) View.GONE else View.VISIBLE, isCropPanelOpen)
-    }
-
-    private fun resizeOvalClick() {
-        viewModel.cropOval()
-    }
-
-    private fun resizeRectangleClick() {
-        viewModel.cropRectangle()
-    }
-
-    private fun resizeCustomClick(x: Float, y: Float) {
-        viewModel.cropCustom(x, y)
-    }
-
-    private fun showTemplatePanel(vis: Int, save: Boolean) {
-        template_panel.visibility = vis
-        when(vis) {
-            View.GONE -> {
-                isCropPanelOpen = false
-                image_preview_editor.setOnTouchListener(null)
-            }
-            View.VISIBLE -> {
-                isCropPanelOpen = true
-                image_preview_editor.setOnTouchListener { v, event ->
-                    if (event.action == MotionEvent.ACTION_MOVE) {
-                        viewModel.cropCustom(event.x, event.y)
-                    }
-                    true
-                }
-            }
-        }
-        if (save) {
-            viewModel.saveCrop()
-        } else {
-            viewModel.resetCrop()
-        }
+        viewModel.bitmap.observe(viewLifecycleOwner, bitmap)
     }
 }

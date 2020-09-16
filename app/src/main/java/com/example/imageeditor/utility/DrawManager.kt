@@ -1,22 +1,12 @@
 package com.example.imageeditor.utility
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import android.graphics.*
 import android.media.ThumbnailUtils
-import android.net.Uri
-import android.provider.MediaStore
-import android.util.Log
-import androidx.fragment.app.Fragment
 import com.example.imageeditor.R
-import java.io.File
-import java.io.InputStream
 
+object DrawManager {
 
-object ImageManager {
-
-    private const val SELECT_TYPE = "image/*"
     private const val DELTA = 70f
 
     private var tempCropImage: Bitmap? = null
@@ -25,55 +15,7 @@ object ImageManager {
     private var rectTop: RectF? = null
     private var rectBottom: RectF? = null
 
-    const val DEFAULT_PADDING = 50f
-    const val REQUEST_IMAGE_CAPTURE = 1
-    const val PICK_IMAGE = 2
-    const val ROTATE_LEFT = -90f
-    const val ROTATE_RIGHT = 90f
-
     var currentBitmap: Bitmap? = null
-    
-    fun loadImageFromCamera(fragment: Fragment) {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(fragment.requireActivity().packageManager)
-            fragment.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-        }
-    }
-
-    fun saveFileToGallery(context: Context, uri: String) {
-        Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE).also { mediaScanIntent ->
-            val f = File(uri)
-            mediaScanIntent.data = Uri.fromFile(f)
-            context.sendBroadcast(mediaScanIntent)
-        }
-    }
-
-    fun loadFromGallery(fragment: Fragment) {
-
-        /* Get from files folder. */
-        val getIntent = Intent(Intent.ACTION_GET_CONTENT)
-        getIntent.type = SELECT_TYPE
-
-        /* Get from photo. */
-        val pickIntent = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        pickIntent.type = SELECT_TYPE
-
-        /* Start activity. */
-        val chooserIntent = Intent.createChooser(getIntent, fragment.getString(R.string.select_picture))
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
-        fragment.startActivityForResult(chooserIntent, PICK_IMAGE)
-    }
-
-    fun createBitmap(stream: InputStream): Bitmap? {
-        return BitmapFactory.decodeStream(stream)
-    }
-
-    fun createBitmap(path: String): Bitmap? {
-        return BitmapFactory.decodeFile(path)
-    }
 
     fun flipImage(): Bitmap? {
         if (currentBitmap == null) {
@@ -140,7 +82,6 @@ object ImageManager {
         return output
     }
 
-    @SuppressLint("ResourceAsColor")
     fun cropCustom(x: Float, y: Float):  Bitmap? {
         if (currentBitmap == null) {
             return null
@@ -206,6 +147,7 @@ object ImageManager {
         return currentBitmap
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun saveCustomCrop(): Bitmap? {
         if (currentBitmap == null) {
             return null

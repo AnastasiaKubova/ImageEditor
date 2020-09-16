@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graf"
+    app:startDestination="@id/mainPanelFragment"
+    tools:ignore="UnusedNavigation">
+
+    <fragment
+        android:id="@+id/cropPanelFragment"
+        android:name="com.example.imageeditor.ui.croppanel.CropPanelFragment"
+        android:label="CropPanelFragment" >
+        <action
+            android:id="@+id/action_cropPanelFragment_to_mainPanelFragment"
+            app:destination="@id/mainPanelFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainPanelFragment"
+        android:name="com.example.imageeditor.ui.mainpanel.MainPanelFragment"
+        android:label="MainPanelFragment" >
+        <action
+            android:id="@+id/action_mainPanelFragment_to_cropPanelFragment"
+            app:destination="@id/cropPanelFragment" />
+    </fragment>
+</navigation>

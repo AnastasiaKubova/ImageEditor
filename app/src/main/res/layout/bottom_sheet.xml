@@ -35,6 +35,14 @@
         android:layout_height="50dp"
         android:text="@string/open_camera" />
 
+
+    <TextView
+        android:id="@+id/custom_picker_bottom_sheet"
+        style="@style/bottom_sheet_text"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/custom_picker"/>
+
     <TextView
         android:id="@+id/save_image_bottom_sheet"
         style="@style/bottom_sheet_text"

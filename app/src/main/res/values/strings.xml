@@ -10,4 +10,10 @@
     <string name="resize">Resize</string>
     <string name="image_preview">Image preview</string>
     <string name="select_picture">Select Picture</string>
+    <string name="custom_picker">Custom picker</string>
+    <string name="check">Check</string>
+    <string name="folder_name">ImageEditor</string>
+    <string name="save_error">Save error.</string>
+    <string name="image_was_saved">Image was saved.</string>
+    <string name="reset">Reset</string>
 </resources>
