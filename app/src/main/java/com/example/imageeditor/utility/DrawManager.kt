@@ -3,11 +3,12 @@ package com.example.imageeditor.utility
 import android.annotation.SuppressLint
 import android.graphics.*
 import android.media.ThumbnailUtils
+import android.util.Log
 import com.example.imageeditor.R
 
 object DrawManager {
 
-    private const val DELTA = 70f
+    private const val DELTA = 170f
 
     private var tempCropImage: Bitmap? = null
     private var rectLeft: RectF? = null
@@ -82,6 +83,7 @@ object DrawManager {
         return output
     }
 
+    @SuppressLint("ResourceAsColor")
     fun cropCustom(x: Float, y: Float):  Bitmap? {
         if (currentBitmap == null) {
             return null
@@ -200,15 +202,23 @@ object DrawManager {
             rectBottom!!.top = y
             rectLeft!!.right = x
         }
+        Log.d(">>>>>>>>>", "x = " + x + ", y = " + y)
+        Log.d(">>>>>>>>>", "top =" + rectBottom!!.top
+                + ", bottom =" + rectBottom!!.bottom + ", left = "
+                + rectBottom!!.left + ", right =" + rectBottom!!.right )
     }
 
     private fun initRectCoords(width: Float, height: Float) {
-        val deltaX = width * 0.1f
-        val deltaY = height * 0.1f
-        rectLeft = RectF(0f, 0f, deltaX, height)
-        rectRight = RectF(width - deltaX, 0f, width, height)
-        rectTop = RectF(0f, 0f, width, deltaY)
-        rectBottom = RectF(0f, height - deltaY, width, height)
+        var delta = 0f
+        if (width > height) {
+            delta = height * 0.1f
+        } else {
+            delta = width * 0.1f
+        }
+        rectLeft = RectF(0f, 0f, delta, height)
+        rectRight = RectF(width - delta, 0f, width, height)
+        rectTop = RectF(0f, 0f, width, delta)
+        rectBottom = RectF(0f, height - delta, width, height)
     }
 
     private fun resetRectCoords() {

@@ -16,4 +16,5 @@
     <string name="save_error">Save error.</string>
     <string name="image_was_saved">Image was saved.</string>
     <string name="reset">Reset</string>
+    <string name="back">Back</string>
 </resources>

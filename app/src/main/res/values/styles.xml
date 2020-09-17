@@ -31,4 +31,9 @@
     <style name="template_panel">
         <item name="android:background">@color/colorPrimaryTransparent</item>
     </style>
+
+    <style name="folder_name_item">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
 </resources>

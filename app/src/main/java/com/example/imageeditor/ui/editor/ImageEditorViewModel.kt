@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.imageeditor.utility.DrawManager
 import com.example.imageeditor.utility.ImagePickerManager
+import java.io.File
 
 class ImageEditorViewModel: ViewModel() {
 
@@ -13,7 +14,13 @@ class ImageEditorViewModel: ViewModel() {
         MutableLiveData<Bitmap>()
     }
 
-    fun initBitmap(btmp: Bitmap) {
+    fun initBitmap() {
+        if (DrawManager.currentBitmap != null) {
+            bitmap.value = DrawManager.currentBitmap
+        }
+    }
+
+    fun setBitmap(btmp: Bitmap) {
         DrawManager.currentBitmap = btmp
         bitmap.value = btmp
     }

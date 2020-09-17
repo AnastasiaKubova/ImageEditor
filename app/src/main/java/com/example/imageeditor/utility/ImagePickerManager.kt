@@ -29,6 +29,8 @@ object ImagePickerManager {
     private const val SELECT_TYPE = "image/*"
     private const val IMAGE_EXTENSION = "jpg png"
 
+    val fileStack: Stack<File> = Stack<File>()
+
     const val DEFAULT_PADDING = 50f
     const val REQUEST_IMAGE_CAPTURE = 1
     const val PICK_IMAGE = 2
@@ -42,7 +44,7 @@ object ImagePickerManager {
         }
     }
 
-    fun saveFileToGallery(context: Context, bitmap: Bitmap) {
+    fun saveImageToGallery(context: Context, bitmap: Bitmap) {
 
         /* Create image name. */
         val title = System.currentTimeMillis().toString()
@@ -79,7 +81,7 @@ object ImagePickerManager {
         }
     }
 
-    fun loadFromGallery(fragment: Fragment) {
+    fun loadImagesFromGallery(fragment: Fragment) {
 
         /* Get from files folder. */
         val getIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -102,21 +104,50 @@ object ImagePickerManager {
         return BitmapFactory.decodeStream(stream)
     }
 
-    fun getImagesList() : MutableList<FileItem> {
-        return mutableListOf()
+    fun createBitmap(file: File): Bitmap? {
+        return BitmapFactory.decodeFile(file.absolutePath)
     }
 
-    fun loadImages(context: Context): MutableList<FileItem> {
-        val file: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        //val file = File(pictureFolder, context.getString(R.string.folder_name))
-        if (file == null || !file.isDirectory) {
+    fun loadPreviewImagesList(saveToTack: Boolean) : MutableList<FileItem> {
+        return loadImagesByFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), saveToTack)
+    }
+
+    fun loadPreviousFile(): MutableList<FileItem> {
+        if (fileStack.isEmpty()) {
+            return mutableListOf()
+        }
+        /* Remove current file. */
+        fileStack.pop()
+
+        /* Check that current stack is still not empty. */
+        if (fileStack.isEmpty()) {
+            return mutableListOf()
+        }
+
+        /* And get previous. */
+        val file = fileStack.pop()
+        return getFiles(file)
+    }
+
+    fun loadImagesByFile(file: File, saveToTack: Boolean): MutableList<FileItem> {
+        if (saveToTack) {
+            fileStack.push(file)
+        }
+        return getFiles(file)
+    }
+
+    private fun getFiles(file: File): MutableList<FileItem> {
+
+        /* Get files from DCIM folder. */
+        // WHY this is not work o_O context.getExternalFilesDir(Environment.DIRECTORY_DCIM) ????
+        if (!file.isDirectory) {
             return mutableListOf()
         }
         val images = file.listFiles().filter {
             it.isDirectory || IMAGE_EXTENSION.contains(it.extension)
         }.map {
             FileItem(
-                it.name, Date(it.lastModified()), Uri.fromFile(it),
+                it.name, Date(it.lastModified()), it,
                 if (it.isDirectory) FileItemType.FOLDER else FileItemType.IMAGE
             )
         }

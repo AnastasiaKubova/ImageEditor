@@ -5,18 +5,21 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.view.MotionEvent.ACTION_MOVE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.imageeditor.R
 import com.example.imageeditor.ui.BaseFragment
+import com.example.imageeditor.ui.croppanel.CropPanelListener
+import com.example.imageeditor.utility.DrawManager
 import com.example.imageeditor.utility.ImagePickerManager
 import kotlinx.android.synthetic.main.bottom_menu.*
 import kotlinx.android.synthetic.main.image_editot_fragment.*
 import kotlinx.android.synthetic.main.crop_panel.*
 
 
-class ImageEditorFragment: BaseFragment() {
+class ImageEditorFragment: BaseFragment(), CropPanelListener {
 
     companion object {
         val instance = ImageEditorFragment()
@@ -71,25 +74,45 @@ class ImageEditorFragment: BaseFragment() {
             }
             bitmap = data.extras!!.get("data") as Bitmap
         }
+
         /* From default picker. */
         else if (requestCode == ImagePickerManager.PICK_IMAGE) {
             if (data.data == null) {
                 return
             }
-//            val uri = data.data
-//            if (uri != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//                requireActivity().contentResolver.takePersistableUriPermission(uri, data.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//            }
-//            val path = uri.toString()
             val imageStream = requireActivity().contentResolver.openInputStream(data.data!!)
             if (imageStream != null) {
                 bitmap = ImagePickerManager.createBitmap(imageStream)
             }
         }
         if (bitmap != null) {
-            viewModel.initBitmap(bitmap)
+            viewModel.setBitmap(bitmap)
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.initBitmap()
+        cropListener = this
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cropListener = null
+    }
+
+    override fun onCropStart() {
+        image_preview_editor.setOnTouchListener { v, event ->
+            if (event.action == ACTION_MOVE) {
+                DrawManager.cropCustom(event.x, event.y)
+            }
+            true
+        }
+    }
+
+    override fun onCropStop() {
+        image_preview_editor.setOnTouchListener(null)
     }
 
     private fun initObservers() {

@@ -13,11 +13,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <ImageView
+    <com.example.imageeditor.ui.custom.CustomImageView
         android:layout_margin="16dp"
         android:scaleType="fitCenter"
         android:id="@+id/image_preview_editor"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:contentDescription="@string/image_preview"
         app:layout_constraintBottom_toTopOf="@+id/bottom_panels_fragment"
@@ -34,6 +34,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graf" />
+        app:navGraph="@navigation/panel_nav_graph" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
