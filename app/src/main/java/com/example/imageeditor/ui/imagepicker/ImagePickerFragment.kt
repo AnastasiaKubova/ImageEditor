@@ -12,6 +12,8 @@ import com.example.imageeditor.R
 import com.example.imageeditor.model.FileItem
 import com.example.imageeditor.ui.BaseFragment
 import com.example.imageeditor.ui.MainActivity
+import com.example.imageeditor.ui.editor.ImageEditorFragment
+import com.example.imageeditor.ui.editor.ImageEditorFragmentDirections
 import com.example.imageeditor.utility.ImagePickerManager
 
 
@@ -61,8 +63,9 @@ class ImagePickerFragment: BaseFragment(), ImagePickerAdapter.FileItemListener, 
         val b = ImagePickerManager.createBitmap(image.file)
         if (b != null) {
             pickerListener?.selectImageListener(b)
-        }
-        findNavController().navigateUp()
+       }
+        val action = ImagePickerFragmentDirections.actionImagePickerFragmentToImageEditorFragment(b)
+        findNavController().navigate(action)
     }
 
     override fun onResume() {

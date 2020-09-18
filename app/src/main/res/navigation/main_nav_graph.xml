@@ -7,6 +7,11 @@
         android:id="@+id/imageEditorFragment"
         android:name="com.example.imageeditor.ui.editor.ImageEditorFragment"
         android:label="ImageEditorFragment" >
+        <argument
+            android:name="selected_bitmap"
+            android:defaultValue="@null"
+            app:nullable="true"
+            app:argType="android.graphics.Bitmap"/>
         <action
             android:id="@+id/action_imageEditorFragment_to_imagePickerFragment"
             app:destination="@id/imagePickerFragment" />

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.imageeditor.R
 import com.example.imageeditor.ui.BaseFragment
 import com.example.imageeditor.ui.croppanel.CropPanelFragment
@@ -39,6 +40,8 @@ class ImageEditorFragment: BaseFragment(), CropPanelFragment.CropPanelListener,
     private val READ_REQUEST_CODE = 2
     private val viewModel by viewModels<ImageEditorViewModel>()
 
+   val args: ImageEditorFragmentArgs by navArgs()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,6 +61,13 @@ class ImageEditorFragment: BaseFragment(), CropPanelFragment.CropPanelListener,
 
         /* Init observ.*/
         initObservers()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val b = args.selectedBitmap
+        if (b != null) {
+            image_preview_editor.setImageBitmap(b)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
