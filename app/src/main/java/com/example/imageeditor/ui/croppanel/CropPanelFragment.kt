@@ -16,9 +16,8 @@ class CropPanelFragment: BaseFragment() {
 
     companion object {
         val instance = CropPanelFragment()
+        var cropListener: CropPanelListener? = null
     }
-
-    private val viewModel: ImageEditorViewModel by viewModels(ownerProducer = { requireParentFragment().requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,9 +33,9 @@ class CropPanelFragment: BaseFragment() {
         setHasOptionsMenu(true)
 
         /* Init listeners. */
-        template_oval.setOnClickListener { resizeOvalClick() }
-        template_rectangle.setOnClickListener { resizeRectangleClick() }
-        template_custom.setOnClickListener { resizeCustomClick(ImagePickerManager.DEFAULT_PADDING, ImagePickerManager.DEFAULT_PADDING) }
+        template_oval.setOnClickListener { cropListener?.cropOvalClick() }
+        template_rectangle.setOnClickListener { cropListener?.cropRectangleClick() }
+        template_custom.setOnClickListener { cropListener?.cropCustomClick() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -47,32 +46,24 @@ class CropPanelFragment: BaseFragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.check_menu -> {
-                viewModel.saveCrop()
+                cropListener?.saveCropClick()
                 openMenuPanel()
                 true
             }
             R.id.reset_menu -> {
-                resetResetClick()
+                cropListener?.resetCropClick()
+                openMenuPanel()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun resizeOvalClick() {
-        viewModel.cropOval()
-    }
-
-    private fun resizeRectangleClick() {
-        viewModel.cropRectangle()
-    }
-
-    private fun resizeCustomClick(x: Float, y: Float) {
-        viewModel.cropCustom(x, y)
-    }
-
-    private fun resetResetClick() {
-        viewModel.resetCrop()
-        openMenuPanel()
+    interface CropPanelListener {
+        fun cropOvalClick()
+        fun cropRectangleClick()
+        fun cropCustomClick()
+        fun resetCropClick()
+        fun saveCropClick()
     }
 }

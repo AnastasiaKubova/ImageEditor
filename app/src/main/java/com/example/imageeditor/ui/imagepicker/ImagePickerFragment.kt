@@ -1,19 +1,17 @@
 package com.example.imageeditor.ui.imagepicker
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.imageeditor.R
 import com.example.imageeditor.model.FileItem
 import com.example.imageeditor.ui.BaseFragment
 import com.example.imageeditor.ui.MainActivity
-import com.example.imageeditor.ui.croppanel.CropPanelListener
-import com.example.imageeditor.ui.editor.ImageEditorViewModel
-import com.example.imageeditor.utility.DrawManager
 import com.example.imageeditor.utility.ImagePickerManager
 
 
@@ -25,6 +23,7 @@ class ImagePickerFragment: BaseFragment(), ImagePickerAdapter.FileItemListener, 
 
     companion object {
         val instance = ImagePickerFragment()
+        var pickerListener: ImagePickerListener? = null
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -36,26 +35,10 @@ class ImagePickerFragment: BaseFragment(), ImagePickerAdapter.FileItemListener, 
         super.onActivityCreated(savedInstanceState)
 
         /* Init menu. */
-        setHasOptionsMenu(true)
-        activity?.actionBar?.setDisplayHomeAsUpEnabled(true)
+        changeFragmentListener?.onChangeFragment(true)
 
         /* Init item list. */
         initImageList()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        menu.clear()
-        inflater.inflate(R.menu.image_picker_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.back -> {
-                onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 
     private fun initImageList() {
@@ -75,7 +58,10 @@ class ImagePickerFragment: BaseFragment(), ImagePickerAdapter.FileItemListener, 
     }
 
     override fun onImageClick(image: FileItem) {
-        DrawManager.currentBitmap = ImagePickerManager.createBitmap(image.file)
+        val b = ImagePickerManager.createBitmap(image.file)
+        if (b != null) {
+            pickerListener?.selectImageListener(b)
+        }
         findNavController().navigateUp()
     }
 
@@ -103,5 +89,9 @@ class ImagePickerFragment: BaseFragment(), ImagePickerAdapter.FileItemListener, 
     private fun updateList(list: MutableList<FileItem>) {
         (viewAdapter as ImagePickerAdapter).imageList = list
         viewAdapter.notifyDataSetChanged()
+    }
+
+    interface ImagePickerListener {
+        fun selectImageListener(bitmap: Bitmap)
     }
 }

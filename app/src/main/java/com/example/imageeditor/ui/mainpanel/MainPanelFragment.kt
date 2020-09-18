@@ -20,9 +20,8 @@ class MainPanelFragment: BaseFragment() {
 
     companion object {
         val instance = MainPanelFragment()
+        var mainPanelListener: MenuPanelListener? = null
     }
-
-    private val viewModel: ImageEditorViewModel by viewModels(ownerProducer = { requireParentFragment().requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,25 +34,19 @@ class MainPanelFragment: BaseFragment() {
         super.onActivityCreated(savedInstanceState)
 
         /* Init click listeners. */
-        rotate_left_bottom_menu.setOnClickListener { rotateLeftClick() }
-        rotate_right_bottom_menu.setOnClickListener { rotateRightClick() }
+        rotate_left_bottom_menu.setOnClickListener { mainPanelListener?.rotateLeftClick() }
+        rotate_right_bottom_menu.setOnClickListener { mainPanelListener?.rotateRightClick() }
         resize_bottom_menu.setOnClickListener { resizeClick() }
-        flip_bottom_menu.setOnClickListener { flipClick() }
-    }
-
-    private fun rotateLeftClick() {
-        viewModel.rotateLeft()
-    }
-
-    private fun rotateRightClick() {
-        viewModel.rotateRight()
-    }
-
-    private fun flipClick() {
-        viewModel.flip()
+        flip_bottom_menu.setOnClickListener { mainPanelListener?.flipClick() }
     }
 
     private fun resizeClick() {
         openCropPanel()
+    }
+
+    interface MenuPanelListener {
+        fun rotateLeftClick()
+        fun rotateRightClick()
+        fun flipClick()
     }
 }
