@@ -4,12 +4,12 @@
 
 ## This project shows how to
 - Use custom Image Picker;
-- Perform different manipulations with image
-- Use custom view for show image.
+- Perform different manipulations with image;
+- Use custom view for showing image.
 
-## Player functionality
-- Select images via custom picker, default android picker and from camera;
-- Perform different manipulations with image (rotate, flim, crop);
+## Image Editor functionality
+- Select images via custom picker, default android picker and via camera;
+- Perform different manipulations with image view (rotate, flip, crop);
 - Save images;
 
 ## Design patterns
