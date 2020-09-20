@@ -24,7 +24,6 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     private var rectRight: RectF? = null
     private var rectTop: RectF? = null
     private var rectBottom: RectF? = null
-    private var mBaseBitmap: Bitmap? = null
     private var isCustomCropMode: Boolean = false
 
     override fun onDraw(canvas: Canvas?) {
@@ -76,7 +75,6 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
 
     fun setImageBitmap(bitmap: Bitmap) {
         mViewBitmap = bitmap
-        mBaseBitmap = bitmap
         mTempCropImage = null
         if (width != 0) {
             resizeBitmap()
@@ -85,10 +83,6 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     private fun setTempBitmap(bitmap: Bitmap) {
-//        mViewBitmap?.recycle()
-//        mTempCropImage?.recycle()
-//        mViewBitmap = null
-//        mTempCropImage = null
         mViewBitmap = bitmap
         mTempCropImage = bitmap
         if (width != 0) {
@@ -118,7 +112,7 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
             return
         }
         isCustomCropMode = false
-        val b = prepareCropRectangle(mBaseBitmap!!)
+        val b = prepareCropRectangle(mViewBitmap!!)
         if (b != null) {
             setTempBitmap(b)
         }
@@ -129,18 +123,18 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
             return
         }
         isCustomCropMode = false
-        val b = prepareCropOval(mBaseBitmap!!)
+        val b = prepareCropOval(mViewBitmap!!)
         if (b != null) {
             setTempBitmap(b)
         }
     }
 
     fun cropCustom() {
-        if (mBaseBitmap == null) {
+        if (mViewBitmap == null) {
             return
         }
         isCustomCropMode = true
-        setTempBitmap(mBaseBitmap!!)
+        setTempBitmap(mViewBitmap!!)
 
         /* Init bitmap size. */
         val bWidth = mViewBitmap!!.width.toFloat()
@@ -153,13 +147,13 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     fun updateCropCustom(x: Float, y: Float) {
-        if (mBaseBitmap == null || !isCustomCropMode) {
+        if (mViewBitmap == null || !isCustomCropMode) {
             return
         }
 
         /* Update rectangle coorgs. */
         updateRect(x, y)
-        setTempBitmap(mBaseBitmap!!)
+        setTempBitmap(mViewBitmap!!)
     }
 
     fun saveCrop() {
@@ -177,8 +171,8 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
         mTempCropImage = null
         isCustomCropMode = false
         resetRectCoords()
-        if (mBaseBitmap != null) {
-            setImageBitmap(mBaseBitmap!!)
+        if (mViewBitmap != null) {
+            setImageBitmap(mViewBitmap!!)
         }
     }
 
@@ -200,11 +194,21 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     private fun prepareCropOval(bitmap: Bitmap): Bitmap? {
-        val width = bitmap.width / 2
-        val height = bitmap.height / 2
+        val width = bitmap.width
+        val height = bitmap.height
+        var topCoord = 0f
+        var leftCoord = 0f
+        var size = 0f
+        if (width > height) {
+            size = height.toFloat()
+            leftCoord -= size / 2
+        } else {
+            size = width.toFloat()
+            topCoord -= size / 2
+        }
 
         /* Create empty bitmap. */
-        val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val output = Bitmap.createBitmap(size.toInt(), size.toInt(), Bitmap.Config.ARGB_8888)
 
         /* Draw empty bitmap in canvas. */
         val canvas = Canvas(output)
@@ -212,12 +216,8 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
         /* Prepare paint for draw template. */
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         val path = Path()
-        val radius = if (width > height) {
-            height
-        } else {
-            width
-        }
-        path.addCircle(width.toFloat(), height.toFloat(), radius.toFloat(), Path.Direction.CW)
+
+        path.addCircle(size / 2, size / 2, size / 2, Path.Direction.CW)
         paint.color = -0x1000000
         canvas.drawPath(path, paint)
 
@@ -228,7 +228,7 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
 
         /* Draw image for cut. */
-        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+        canvas.drawBitmap(bitmap, leftCoord, topCoord, paint)
         return output
     }
 
@@ -258,15 +258,6 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
 
         /* Prepare paint for draw template. */
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-
-        /* Draw rectangles. */
-//        val path = Path()
-//        paint.color = -0x1000000
-//        path.addRect(rectLeft!!.right, rectTop!!.bottom, rectRight!!.left, rectBottom!!.top, Path.Direction.CW)
-//        canvas.drawPath(path, paint)
-//
-//        /* Draw final image. */
-//        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
         canvas.drawBitmap(bitmap, - rectLeft!!.width(), - rectTop!!.height(), paint)
         resetRectCoords()
         return output

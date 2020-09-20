@@ -33,9 +33,17 @@ class CropPanelFragment: BaseFragment() {
         setHasOptionsMenu(true)
 
         /* Init listeners. */
-        template_oval.setOnClickListener { cropListener?.cropOvalClick() }
-        template_rectangle.setOnClickListener { cropListener?.cropRectangleClick() }
-        template_custom.setOnClickListener { cropListener?.cropCustomClick() }
+        template_oval.setOnClickListener {
+            cropListener?.cropOvalClick()
+            openMenuPanel()
+        }
+        template_rectangle.setOnClickListener {
+            cropListener?.cropRectangleClick()
+            openMenuPanel()
+        }
+        template_custom.setOnClickListener {
+            cropListener?.cropCustomClick()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

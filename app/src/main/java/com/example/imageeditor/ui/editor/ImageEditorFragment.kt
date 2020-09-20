@@ -131,11 +131,13 @@ class ImageEditorFragment: BaseFragment(), CropPanelFragment.CropPanelListener,
     override fun cropOvalClick() {
         image_preview_editor.setOnTouchListener(null)
         image_preview_editor.cropOval()
+        image_preview_editor.saveCrop()
     }
 
     override fun cropRectangleClick() {
         image_preview_editor.setOnTouchListener(null)
         image_preview_editor.cropRectangle()
+        image_preview_editor.saveCrop()
     }
 
     @SuppressLint("ClickableViewAccessibility")
