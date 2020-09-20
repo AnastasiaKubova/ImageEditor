@@ -44,7 +44,9 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     private fun onDrawCropCustomMode(canvas: Canvas?) {
 
         /* Draw empty bitmap in canvas. */
-        canvas?.drawBitmap(mViewBitmap!!, 0f, 0f, Paint())
+        val left = width / 2f - mViewBitmap!!.width / 2f
+        val top = height / 2f - mViewBitmap!!.height / 2f
+        canvas?.drawBitmap(mViewBitmap!!, left, top, Paint())
 
         /* Prepare paint for draw template. */
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -83,6 +85,10 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     private fun setTempBitmap(bitmap: Bitmap) {
+//        mViewBitmap?.recycle()
+//        mTempCropImage?.recycle()
+//        mViewBitmap = null
+//        mTempCropImage = null
         mViewBitmap = bitmap
         mTempCropImage = bitmap
         if (width != 0) {
@@ -130,19 +136,24 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     fun cropCustom() {
-        if (mViewBitmap == null) {
+        if (mBaseBitmap == null) {
             return
-        }
-        /* Init rect coordinates. */
-        if (rectBottom == null || rectLeft == null || rectRight == null || rectTop == null) {
-            initRectCoords(width.toFloat(), height.toFloat())
         }
         isCustomCropMode = true
         setTempBitmap(mBaseBitmap!!)
+
+        /* Init bitmap size. */
+        val bWidth = mViewBitmap!!.width.toFloat()
+        val bHeight = mViewBitmap!!.height.toFloat()
+
+        /* Init rect coordinates. */
+        if (rectBottom == null || rectLeft == null || rectRight == null || rectTop == null) {
+            initRectCoords(bWidth, bHeight)
+        }
     }
 
     fun updateCropCustom(x: Float, y: Float) {
-        if (mViewBitmap == null || !isCustomCropMode) {
+        if (mBaseBitmap == null || !isCustomCropMode) {
             return
         }
 
@@ -152,9 +163,9 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     fun saveCrop() {
-        if (mTempCropImage != null) {
+        if (mViewBitmap != null) {
             if (isCustomCropMode) {
-                mTempCropImage = saveCustomCrop(mBaseBitmap!!)
+                mTempCropImage = saveCustomCrop(mViewBitmap!!)
                 isCustomCropMode = false
             }
             setImageBitmap(mTempCropImage!!)
@@ -180,7 +191,7 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
     private fun initRotateImage(angle: Float, bitmap: Bitmap): Bitmap {
         val matrix = Matrix()
         matrix.postRotate(angle)
-        return Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, true)
+        return Bitmap.createBitmap(bitmap,0,0, bitmap.width, bitmap.height, matrix, false)
     }
 
     private fun prepareCropRectangle(bitmap: Bitmap): Bitmap?  {
@@ -225,22 +236,22 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
 
         // Resize bitmap for show image in display.
         val bitmap = mViewBitmap ?: return
-        val vRatio = width / height
-        val bRation = bitmap.width / bitmap.height
-        mViewBitmap = if (vRatio < bRation) {
-            val h = width.toFloat() * bitmap.height / bitmap.width
-            Bitmap.createScaledBitmap(bitmap, width, h.toInt(),false)
+        val h = width.toFloat() * bitmap.height / bitmap.width
+        val w = height.toFloat()  * bitmap.width / bitmap.height
+        mViewBitmap = if (h < height) {
+            Bitmap.createScaledBitmap(bitmap, width, h.toInt(),true)
         } else {
-            val w = height.toFloat()  * bitmap.width / bitmap.height
-            Bitmap.createScaledBitmap(bitmap, w.toInt(), height,false)
+            Bitmap.createScaledBitmap(bitmap, w.toInt(), height,true)
         }
     }
 
     @SuppressLint("ResourceAsColor")
     private fun saveCustomCrop(bitmap: Bitmap): Bitmap? {
+        val newWidth = rectRight!!.left - rectLeft!!.right
+        val newHeight = rectBottom!!.top - rectTop!!.bottom
 
         /* Create empty bitmap. */
-        val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val output = Bitmap.createBitmap(newWidth.toInt(), newHeight.toInt(), Bitmap.Config.ARGB_8888)
 
         /* Draw empty bitmap in canvas. */
         val canvas = Canvas(output)
@@ -249,14 +260,14 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         /* Draw rectangles. */
-        val path = Path()
-        paint.color = -0x1000000
-        path.addRect(rectLeft!!.right, rectTop!!.bottom, rectRight!!.left, rectBottom!!.top, Path.Direction.CW)
-        canvas.drawPath(path, paint)
-
-        /* Draw final image. */
-        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+//        val path = Path()
+//        paint.color = -0x1000000
+//        path.addRect(rectLeft!!.right, rectTop!!.bottom, rectRight!!.left, rectBottom!!.top, Path.Direction.CW)
+//        canvas.drawPath(path, paint)
+//
+//        /* Draw final image. */
+//        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(bitmap, - rectLeft!!.width(), - rectTop!!.height(), paint)
         resetRectCoords()
         return output
     }
@@ -289,17 +300,21 @@ class CustomImageView(context: Context?, attrs: AttributeSet?) : View(context, a
         }
     }
 
-    private fun initRectCoords(width: Float, height: Float) {
+    private fun initRectCoords(wb: Float, hb: Float) {
         var delta = 0f
         delta = if (width > height) {
             height * 0.1f
         } else {
             width * 0.1f
         }
-        rectLeft = RectF(0f, 0f, delta, height)
-        rectTop = RectF(0f, 0f, width, delta)
-        rectRight = RectF(width - delta, 0f, width, height)
-        rectBottom = RectF(0f, height - delta, width, height)
+        val left = width / 2f - wb / 2f
+        val top = height / 2f - hb / 2f
+        val right =  width / 2f + wb / 2f
+        val bottom = height / 2f + hb / 2f
+        rectLeft = RectF(left, top, left + delta, bottom)
+        rectTop = RectF(left, top, right, top + delta)
+        rectRight = RectF(right - delta, top, right, bottom)
+        rectBottom = RectF(left, bottom - delta, right, bottom)
     }
 
     private fun resetRectCoords() {
