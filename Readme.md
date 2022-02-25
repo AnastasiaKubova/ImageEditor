@@ -1,4 +1,4 @@
-# This is a sample project to creating "Image Editor".
+# [DEPRECATED] This is a sample project to creating "Image Editor".
 
 <img src="https://github.com/AnastasiaKubova/ImageEditor/blob/master/preview/preview.gif?raw=true" width="250" />
 
